@@ -1,4 +1,4 @@
-module fetch_datapath (
+module decode_datapath (
     input logic clk,
     input logic decode_enable,
     input logic i_din,
@@ -9,12 +9,12 @@ module fetch_datapath (
 
     // Program Counter Chooser Logic
     always@(posedge clk) begin
-        if(decode_stall)       // Decode Stall
+        if(decode_stall)            // Decode Stall
             instr <= instr;
         else if(decode_enable)      // Fetch Unit Enabled
             instr <= i_din;
         else
-            instr <= instr;     // Default
+            instr <= instr;         // Default
     end
 
     
