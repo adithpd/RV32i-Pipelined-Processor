@@ -1,69 +1,56 @@
 module fetch_controller#(
     parameter CACHE_SWITCH = 1'b0,
 )(
-    input logic clk
-    output logic i_mem_din,
-    output logic decode_enable,
-    input logic decode_stall,
-    output logic memory_control,
-    output logic i_mem_fetch_done_control,
-    output logic fetch_stall_control,
-    output logic fetch_busy_control
+    input logic clk,                        
+    input logic fetch_enable,               // From Testbench
+    input logic instr_cache_processing,     // From instruction_cache_controller
+    input logic fetch_stall_external,       // From decode_controller
+
+    output logic decode_enable,             // To decode_controller
+
+    output logic fetch_stall_control,       // To fetch_datapath
+    output logic fetch_enable_control       // To fetch_datapath
 );
-    // fetch_busy and fetch_stall Latches
-    logic fetch_busy, fetch_stall, i_mem_fetch_done;
-
-    // Control Signal Assignments
-    assign i_mem_fetch_done_control = i_mem_fetch_done;
-    assign fetch_stall_control = fetch_stall;
-    assign fetch_busy_control = fetch_busy;
-
     // FSM State Definition
-    typedef enum logic { READY, CHECK_CACHE, FETCH_FROM_MEMORY } state_t;
+    typedef enum logic { IDLE, FETCH } state_t;
     state_t state, next_state;
 
+    // Fetch Stall Latch
+    logic fetch_stall_internal;
+    assign fetch_stall_internal = (instr_cache_processing);
+
+    // Control Signal Assignments
+    assign fetch_stall_control = (fetch_stall_internal) || (fetch_stall_external);
+    assign fetch_enable_control = fetch_enable;
+
+    // Decode Enable Assignment
+    assign decode_enable = (state == FETCH) && (!fetch_stall_internal && !fetch_stall_external);
+    
     // State Transition Logic
     always_comb begin
         // Preventing unintentional latches
         next_state = state;
-        fetch_busy = 1'b0;
-        fetch_stall = 1'b0;
-        i_mem_fetch_done = 1'b0;
-        decode_enable = 1'b0;
-
 
         // FSM Transition Conditions
         case(state)
-            READY: begin
-                if(!fetch_busy && !fetch_stall)
-                    next_state = CHECK_CACHE;
+            IDLE: begin
+                if(fetch_enable)
+                    next_state = FETCH;
             end
 
-            CHECK_CACHE: begin
-                if(!CACHE_SWITCH)
-                    next_state = FETCH_FROM_MEMORY;
+            FETCH: begin
+                if(fetch_stall_internal || fetch_stall_external || fetch_enable)
+                    next_state = FETCH;
+                else
+                    next_state = IDLE;
             end
-
-            FETCH_FROM_MEMORY: begin
-                // Memory modelled by Behavioral Testbench
-                // --->
-                i_mem_fetch_done = 1'b1;
-                if(i_mem_fetch_done && !decode_stall) begin
-                    decode_enable = 1'b1;
-                    next_state = READY;
-                end
-            end
-
         endcase
     end
-
-    assign fetch_busy = (state != READY);
-    assign fetch_stall = (state != READY);
 
     // State Transition 
     always @(posedge clk) begin
         if(!reset_n) 
-            state <= READY;
+            state <= IDLE;
         else 
             state <= next_state;
     end
