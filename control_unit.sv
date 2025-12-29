@@ -4,6 +4,7 @@ module control_unit #(
     input  logic [6:0]      op,
     input  logic [2:0]      funct3,
     input  logic            funct7,
+    
     output logic            RegWriteD,              // Register File Write Enable
     output logic [1:0]      ResultSrcD,             // Writeback source mux selector
     output logic            MemWriteD,              // Data Memory Write Enable
@@ -30,20 +31,20 @@ module control_unit #(
                 case(funct3)
                     3'b000: begin
                         case(funct7)
-                            1'b0: ALUControlD = 4'b0000; //add
-                            1'b1: ALUControlD = 4'b0001; //sub
+                            1'b0: ALUControlD = 4'b0000; // add
+                            1'b1: ALUControlD = 4'b0001; // sub
                         endcase
                     end
-                    3'b001: ALUControlD = 4'b0111; //sll
-                    3'b010: ALUControlD = 4'b0101; //slt
+                    3'b001: ALUControlD = 4'b0111; // sll
+                    3'b010: ALUControlD = 4'b0101; // slt
                     3'b011: ALUControlD = 4'b0110; // sltu
-                    3'b100: ALUControlD = 4'b0100; //xor
+                    3'b100: ALUControlD = 4'b0100; // xor
                     3'b110: ALUControlD = 4'b0011; // or
-                    3'b111: ALUControlD = 4'b0010; //and
+                    3'b111: ALUControlD = 4'b0010; // and
                     3'b101: begin
                         case(funct7)
-                            1'b0:  ALUControlD = 4'b1000; //srl
-                            1'b1:  ALUControlD = 4'b1011; //sra 
+                            1'b0:  ALUControlD = 4'b1000; // srl
+                            1'b1:  ALUControlD = 4'b1011; // sra 
                         endcase
                     end
                     default: ALUControlD = 4'b0000;
@@ -83,16 +84,16 @@ module control_unit #(
                 JALRInstrD = 1'b0;
 
                 case(funct3)
-                    3'b000: ALUControlD = 4'b0000; //addi
+                    3'b000: ALUControlD = 4'b0000; // addi
                     3'b001: ALUControlD = 4'b0111; // slli
-                    3'b100: ALUControlD = 4'b0100; //xori
+                    3'b100: ALUControlD = 4'b0100; // xori
                     3'b101: 
                         case(funct7)
-                            1'b0: ALUControlD = 4'b1000; //srli
-                            1'b1: ALUControlD = 4'b1011; //srai 
+                            1'b0: ALUControlD = 4'b1000; // srli
+                            1'b1: ALUControlD = 4'b1011; // srai 
                         endcase
                     3'b110: ALUControlD = 4'b0011; // ori
-                    3'b111: ALUControlD = 4'b0010; //andi
+                    3'b111: ALUControlD = 4'b0010; // andi
                     default: ALUControlD = 4'b0000;
                 endcase
             end

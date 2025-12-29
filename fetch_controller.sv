@@ -1,15 +1,15 @@
 module fetch_controller#(
     parameter CACHE_SWITCH = 1'b0,
 )(
-    input logic clk,                        
-    input logic fetch_enable,               // From Testbench
-    input logic instr_cache_processing,     // From instruction_cache_controller
-    input logic fetch_stall_external,       // From decode_controller
+    input   logic   clk,                        
+    input   logic   fetch_enable,               // From Testbench
+    input   logic   instr_cache_processing,     // From instruction_cache_controller
+    input   logic   fetch_stall_external,       // From decode_controller
 
-    output logic decode_enable,             // To decode_controller
+    output  logic   decode_enable,              // To decode_controller
 
-    output logic fetch_stall_control,       // To fetch_datapath
-    output logic fetch_enable_control       // To fetch_datapath
+    output  logic   fetch_stall_control,        // To fetch_datapath
+    output  logic   fetch_enable_control        // To fetch_datapath
 );
     // FSM State Definition
     typedef enum logic { IDLE, FETCH } state_t;
