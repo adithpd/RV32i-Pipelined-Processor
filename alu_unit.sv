@@ -1,10 +1,11 @@
 module alu_unit #(
     parameter DATA_WIDTH = 32
 )(  
-    input logic [DATA_WIDTH-1:0] SrcA,
-    input logic [DATA_WIDTH-1:0] SrcB,
-    input logic [3:0] ALUControl,
-    output logic Zero,
+    input logic [DATA_WIDTH-1:0] SrcA,          // From execute_datapath (Source-A)
+    input logic [DATA_WIDTH-1:0] SrcB,          // From execute_datapath (Source-B)
+    input logic [3:0] ALUControl,               // From execute_datapath (Operation Arbiter)
+
+    output logic Zero,                          // To
     output logic [DATA_WIDTH-1:0] ALUResult
 );
     logic [DATA_WIDTH-1:0] u_SrcA;
